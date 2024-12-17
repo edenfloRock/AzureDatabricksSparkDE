@@ -86,9 +86,13 @@ races_final_df.printSchema()
 
 # COMMAND ----------
 
-races_final_df.write.mode("overwrite").parquet("/mnt/edenflostoragedata/processed/races")
+races_final_df.write.mode("overwrite").partitionBy("race_year").parquet("/mnt/edenflostoragedata/processed/races")
 
 # COMMAND ----------
 
 display( spark.read.parquet("/mnt/edenflostoragedata/processed/races"))
+
+
+# COMMAND ----------
+
 
