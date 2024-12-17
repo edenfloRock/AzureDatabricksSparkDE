@@ -70,4 +70,51 @@ circuits_df.printSchema()
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC ##### Step 2 - Select only the requieres columns 
+
+# COMMAND ----------
+
+# DBTITLE 1,Form 1
+circuits_selected_df = circuits_df.select("circuitId", "name", "location")
+display(circuits_selected_df)
+
+# COMMAND ----------
+
+# DBTITLE 1,Form 2
+circuits_selected_df = circuits_df.select(circuits_df.circuitId, circuits_df.name, circuits_df.location)
+display(circuits_selected_df)
+
+# COMMAND ----------
+
+# DBTITLE 1,Form 3
+circuits_selected_df = circuits_df.select(circuits_df["circuitId"], circuits_df["name"], circuits_df["location"])
+display(circuits_selected_df)
+
+# COMMAND ----------
+
+# DBTITLE 1,Form 4
+# More flexible
+from pyspark.sql.functions import col
+circuits_selected_df = circuits_df.select(col("circuitId").alias("Circuit ID"), col("name"), col("location"))
+display(circuits_selected_df)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ##### Step 3 - Rename the columns as required
+
+# COMMAND ----------
+
+# Columns no mentioned in the select() are no changed
+circuits_renamed_df = circuits_df.withColumnRenamed("circuitId", "circuit_id") \
+  .withColumnRenamed("circuitRef", "circuit_ref") \
+  .withColumnRenamed("latitude", "latitudes") \
+  .withColumnRenamed("long", "longitude") \
+  .withColumnRenamed("alt", "altitudes") 
+display(circuits_renamed_df)
+
+
+# COMMAND ----------
+
 
