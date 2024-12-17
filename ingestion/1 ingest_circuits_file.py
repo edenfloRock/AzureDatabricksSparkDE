@@ -96,6 +96,7 @@ display(circuits_selected_df)
 # DBTITLE 1,Form 4
 # More flexible
 from pyspark.sql.functions import col
+
 circuits_selected_df = circuits_df.select(col("circuitId").alias("Circuit ID"), col("name"), col("location"))
 display(circuits_selected_df)
 
@@ -114,6 +115,54 @@ circuits_renamed_df = circuits_df.withColumnRenamed("circuitId", "circuit_id") \
   .withColumnRenamed("alt", "altitudes") 
 display(circuits_renamed_df)
 
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ##### Step 4 - Get current timestamp
+
+# COMMAND ----------
+
+from pyspark.sql.functions import current_timestamp, lit
+
+circuits_final_df = circuits_renamed_df.withColumn("ingestion_date", current_timestamp()) \
+  .withColumn('env', lit('PRO'))
+
+display(circuits_final_df)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ##### Step 5 - Drop URL column
+
+# COMMAND ----------
+
+circuits_final_df = circuits_final_df.drop('url')
+display(circuits_final_df)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ##### Step 6 - Write data to datalake as parquet
+
+# COMMAND ----------
+
+circuits_final_df.write.mode("overwrite").parquet("/mnt/edenflostoragedata/processed/circuits")
+
+# COMMAND ----------
+
+# MAGIC %fs
+# MAGIC ls /mnt/edenflostoragedata/processed/circuits
+
+# COMMAND ----------
+
+# MAGIC %fs
+# MAGIC mounts
+
+# COMMAND ----------
+
+df = spark.read.parquet("/mnt/edenflostoragedata/processed/circuits")
+display(df)
 
 # COMMAND ----------
 
