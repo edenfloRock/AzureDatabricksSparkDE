@@ -4,8 +4,22 @@
 
 # COMMAND ----------
 
+# DBTITLE 1,run configuration Notebook
+# MAGIC %run "../includes/configuration"
+
+# COMMAND ----------
+
+# DBTITLE 1,run common_functions Notebook
+# MAGIC %run "../includes/common_functions"
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC ##### Step 1 - Read the CSV file using the spark dataframe  
+
+# COMMAND ----------
+
+raw_folder_path
 
 # COMMAND ----------
 
@@ -19,7 +33,7 @@
 
 # COMMAND ----------
 
-circuits_df = spark.read.csv('dbfs:/mnt/edenflostoragedata/raw/circuits.csv', header=True, inferSchema=True)
+circuits_df = spark.read.csv(f"{raw_folder_path}/circuits.csv", header=True, inferSchema=True)
 
 # COMMAND ----------
 
@@ -58,7 +72,7 @@ circuits_schema = StructType([
 circuits_df = spark.read \
     .option('header', True) \
     .schema(circuits_schema) \
-    .csv('dbfs:/mnt/edenflostoragedata/raw/circuits.csv')
+    .csv(f"{raw_folder_path}/circuits.csv")
 
 # COMMAND ----------
 
@@ -119,14 +133,22 @@ display(circuits_renamed_df)
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ##### Step 4 - Get current timestamp
+# MAGIC ##### Step 4 - ingestion_date (Get current timestamp)
 
 # COMMAND ----------
 
-from pyspark.sql.functions import current_timestamp, lit
+# DBTITLE 1,call function: add_ingestion_date
 
-circuits_final_df = circuits_renamed_df.withColumn("ingestion_date", current_timestamp()) \
-  .withColumn('env', lit('PRO'))
+circuits_final1_df = add_ingestion_date(circuits_renamed_df) 
+
+display(circuits_final1_df)
+
+# COMMAND ----------
+
+# DBTITLE 1,Add new column: env
+from pyspark.sql.functions import lit
+
+circuits_final_df = circuits_final1_df.withColumn('env', lit('PRO'))
 
 display(circuits_final_df)
 
@@ -147,7 +169,7 @@ display(circuits_final_df)
 
 # COMMAND ----------
 
-circuits_final_df.write.mode("overwrite").parquet("/mnt/edenflostoragedata/processed/circuits")
+circuits_final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/circuits")
 
 # COMMAND ----------
 
@@ -161,9 +183,5 @@ circuits_final_df.write.mode("overwrite").parquet("/mnt/edenflostoragedata/proce
 
 # COMMAND ----------
 
-df = spark.read.parquet("/mnt/edenflostoragedata/processed/circuits")
+df = spark.read.parquet(f"{processed_folder_path}/circuits")
 display(df)
-
-# COMMAND ----------
-
-

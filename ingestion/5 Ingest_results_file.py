@@ -9,12 +9,19 @@
 
 # COMMAND ----------
 
-from pyspark.sql.functions import concat, col, current_timestamp, lit
+# MAGIC %run "../includes/configuration"
+
+# COMMAND ----------
+
+# MAGIC %run "../includes/common_functions"
+
+# COMMAND ----------
+
+from pyspark.sql.functions import concat, col, lit
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType, DecimalType
 
 # COMMAND ----------
 
-#"":1,"":18,"":1,"":1,"":22,"":1,"":1,"":1,"":1,"":10,"":58,"":"1:34:50.616","":5690616,"":39,"":2,"":"1:27.452","":218.3,"":1
 results_schema = StructType([ 
     StructField("resultId", IntegerType(), True),
     StructField("raceId", IntegerType(), True),
@@ -41,7 +48,7 @@ results_schema = StructType([
 
 results_df = spark.read \
     .schema(results_schema) \
-    .json("/mnt/edenflostoragedata/raw/results.json")
+    .json(f"{raw_folder_path}/results.json")
 display(results_df)
 
 # COMMAND ----------
@@ -61,14 +68,24 @@ results_renamed_df = results_df \
     .withColumnRenamed("fastestLap", "fastest_lap") \
     .withColumnRenamed("fastestLapTime", "fastest_lap_time") \
     .withColumnRenamed("fastestLapSpeed", "fastest_lap_speed") \
-    .withColumn("ingestion_date", current_timestamp()) \
     .drop ("statusId")
 
 display(results_renamed_df)
 
 # COMMAND ----------
 
-results_renamed_df.write.mode("overwrite").partitionBy("race_id") .parquet("/mnt/edenflostoragedata/processed/results")
+results_final_df = add_ingestion_date(results_renamed_df)
+
+# COMMAND ----------
+
+results_final_df.write \
+    .mode("overwrite") \
+    .partitionBy("race_id") \
+    .parquet(f"{processed_folder_path}/results")
+
+# COMMAND ----------
+
+display(dbutils.fs.ls(f"{processed_folder_path}/results"))
 
 # COMMAND ----------
 
@@ -77,8 +94,4 @@ results_renamed_df.write.mode("overwrite").partitionBy("race_id") .parquet("/mnt
 
 # COMMAND ----------
 
-display(spark.read.parquet("/mnt/edenflostoragedata/processed/results"))
-
-# COMMAND ----------
-
-
+display(spark.read.parquet(f"{processed_folder_path}/results"))

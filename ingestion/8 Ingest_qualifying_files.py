@@ -9,8 +9,15 @@
 
 # COMMAND ----------
 
+# MAGIC %run "../includes/configuration"
+
+# COMMAND ----------
+
+# MAGIC %run "../includes/common_functions"
+
+# COMMAND ----------
+
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType
-from pyspark.sql.functions import current_timestamp
 
 # COMMAND ----------
 
@@ -33,7 +40,7 @@ schema_qualifying = StructType([
 qualifying_df = spark.read \
     .option("schema", schema_qualifying) \
     .option("multiLine", True) \
-    .json("dbfs:/mnt/edenflostoragedata/raw/qualifying/")
+    .json(f"{raw_folder_path}/qualifying/")
 
 
 
@@ -48,14 +55,17 @@ qualifying_df.count()
 
 # COMMAND ----------
 
-qualifying_final_df = qualifying_df \
+qualifying_final1_df = qualifying_df \
     .withColumnRenamed("qualifyId", "qualify_id") \
     .withColumnRenamed("raceId", "race_id") \
     .withColumnRenamed("driverId", "driver_id") \
-    .withColumnRenamed("constructorId", "constructor_id") \
-    .withColumn("ingestion_date", current_timestamp()) \
+    .withColumnRenamed("constructorId", "constructor_id")    
 
-display(qualifying_final_df)
+display(qualifying_final1_df)
+
+# COMMAND ----------
+
+qualifying_final_df = add_ingestion_date(qualifying_final1_df)
 
 # COMMAND ----------
 
@@ -66,7 +76,7 @@ display(qualifying_final_df)
 
 qualifying_final_df.write \
     .mode("overwrite") \
-    .parquet("/mnt/edenflostoragedata/processed/qualifying")
+    .parquet(f"{processed_folder_path}/qualifying")
 
 # COMMAND ----------
 
@@ -75,7 +85,7 @@ qualifying_final_df.write \
 
 # COMMAND ----------
 
-df = spark.read.parquet("/mnt/edenflostoragedata/processed/qualifying")
+df = spark.read.parquet(f"{processed_folder_path}/qualifying")
 df.count()
 
 # COMMAND ----------

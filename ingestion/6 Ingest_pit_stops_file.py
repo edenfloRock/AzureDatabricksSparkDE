@@ -9,8 +9,15 @@
 
 # COMMAND ----------
 
+# MAGIC %run "../includes/configuration"
+
+# COMMAND ----------
+
+# MAGIC %run "../includes/common_functions"
+
+# COMMAND ----------
+
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType
-from pyspark.sql.functions import current_timestamp
 
 # COMMAND ----------
 
@@ -29,7 +36,7 @@ pit_stops_schema = StructType(fields=[
 pits_stops_df = spark.read \
     .schema(pit_stops_schema) \
     .option("multiLine", True) \
-    .json("/mnt/edenflostoragedata/raw/pit_stops.json")
+    .json(f"{raw_folder_path}/pit_stops.json")
 
 display(pits_stops_df)
 
@@ -40,12 +47,15 @@ display(pits_stops_df)
 
 # COMMAND ----------
 
-pit_stops_final_df = pits_stops_df \
+pit_stops_final1_df = pits_stops_df \
   .withColumnRenamed("driverId", "driver_id") \
-  .withColumnRenamed("raceId", "race_id") \
-  .withColumn("ingestion_date", current_timestamp())
+  .withColumnRenamed("raceId", "race_id")
 
-display(pit_stops_final_df)
+display(pit_stops_final1_df)
+
+# COMMAND ----------
+
+pit_stops_final_df = add_ingestion_date(pit_stops_final1_df)
 
 # COMMAND ----------
 
@@ -56,7 +66,7 @@ display(pit_stops_final_df)
 
 pit_stops_final_df \
     .write.mode("overwrite") \
-    .parquet("/mnt/edenflostoragedata/processed/pit_stops")
+    .parquet(f"{processed_folder_path}/pit_stops")
 
 # COMMAND ----------
 
@@ -65,8 +75,4 @@ pit_stops_final_df \
 
 # COMMAND ----------
 
-display(spark.read.parquet("/mnt/edenflostoragedata/processed/pit_stops"))
-
-# COMMAND ----------
-
-
+display(spark.read.parquet(f"{processed_folder_path}/pit_stops"))

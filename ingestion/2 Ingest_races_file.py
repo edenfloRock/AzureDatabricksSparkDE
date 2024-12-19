@@ -4,6 +4,18 @@
 
 # COMMAND ----------
 
+# MAGIC %run "../includes/configuration"
+
+# COMMAND ----------
+
+# MAGIC %run "../includes/common_functions"
+
+# COMMAND ----------
+
+display(dbutils.fs.ls (raw_folder_path))
+
+# COMMAND ----------
+
 # MAGIC %fs
 # MAGIC ls /mnt/edenflostoragedata/raw
 
@@ -31,7 +43,7 @@ races_schema = StructType([
 races_df = spark.read \
     .option('header', True) \
     .schema(races_schema) \
-    .csv('dbfs:/mnt/edenflostoragedata/raw/races.csv')
+    .csv(f"{raw_folder_path}/races.csv")
 
 display(races_df)
 
@@ -68,12 +80,16 @@ display(races_renamed_df)
 
 from pyspark.sql.functions import to_timestamp, concat, lit, current_timestamp
 
-races_final_df = races_renamed_df \
+races_final1_df = races_renamed_df \
   .withColumn("race_timestamp", to_timestamp(concat(col("date"), lit(" "), col("time")), "yyyy-MM-dd HH:mm:ss" )) \
-  .withColumn("ingestion_date", current_timestamp()) \
   .drop("date") \
   .drop("time")
-display(races_final_df)
+display(races_final1_df)
+
+# COMMAND ----------
+
+# DBTITLE 1,Add ingestion_date column
+races_final_df = add_ingestion_date(races_final1_df)
 
 # COMMAND ----------
 
@@ -86,13 +102,9 @@ races_final_df.printSchema()
 
 # COMMAND ----------
 
-races_final_df.write.mode("overwrite").partitionBy("race_year").parquet("/mnt/edenflostoragedata/processed/races")
+races_final_df.write.mode("overwrite").partitionBy("race_year").parquet(f"{processed_folder_path}/races")
 
 # COMMAND ----------
 
-display( spark.read.parquet("/mnt/edenflostoragedata/processed/races"))
-
-
-# COMMAND ----------
-
+display( spark.read.parquet(f"{processed_folder_path}/races"))
 

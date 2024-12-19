@@ -9,6 +9,14 @@
 
 # COMMAND ----------
 
+# MAGIC %run "../includes/configuration"
+
+# COMMAND ----------
+
+# MAGIC %run "../includes/common_functions"
+
+# COMMAND ----------
+
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType
 
 # COMMAND ----------
@@ -33,7 +41,7 @@ drivers_schema = StructType(fields=[
 
 # COMMAND ----------
 
-drivers_df = spark.read.json("dbfs:/mnt/edenflostoragedata/raw/drivers.json", schema=drivers_schema)
+drivers_df = spark.read.json(f"{raw_folder_path}/drivers.json", schema=drivers_schema)
 display(drivers_df)
 
 # COMMAND ----------
@@ -51,17 +59,20 @@ drivers_df.printSchema()
 
 # COMMAND ----------
 
-from pyspark.sql.functions import col, concat, current_timestamp, lit
+from pyspark.sql.functions import col, concat,  lit
 
 # COMMAND ----------
 
 drivers_with_columns_df = drivers_df \
     .withColumnRenamed("driverId", "driver_id") \
     .withColumnRenamed("driverRef", "driver_ref") \
-    .withColumn("ingestion_date", current_timestamp()) \
     .withColumn("name", concat(col("name.forename"), lit(" "), col("name.surname")))
 
 display(drivers_with_columns_df)
+
+# COMMAND ----------
+
+drivers_ingestion_date_df = add_ingestion_date (drivers_with_columns_df) 
 
 # COMMAND ----------
 
@@ -73,12 +84,12 @@ display(drivers_with_columns_df)
 
 # COMMAND ----------
 
-drivers_final_df = drivers_with_columns_df.drop("namer.forename", "namer.surname", "url")
+drivers_final_df = drivers_ingestion_date_df.drop("namer.forename", "namer.surname", "url")
 display(drivers_final_df)
 
 # COMMAND ----------
 
-drivers_final_df.write.mode("overwrite").parquet("/mnt/edenflostoragedata/processed/drivers")
+drivers_final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/drivers")
 
 # COMMAND ----------
 
@@ -87,8 +98,4 @@ drivers_final_df.write.mode("overwrite").parquet("/mnt/edenflostoragedata/proces
 
 # COMMAND ----------
 
-display(spark.read.parquet("/mnt/edenflostoragedata/processed/drivers"))
-
-# COMMAND ----------
-
-
+display(spark.read.parquet(f"{processed_folder_path}/drivers"))
