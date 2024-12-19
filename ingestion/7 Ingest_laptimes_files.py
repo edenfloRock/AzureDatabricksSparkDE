@@ -15,7 +15,7 @@ from pyspark.sql.functions import current_timestamp
 # COMMAND ----------
 
 lap_times_schemas = StructType(    
-    fields=[StructField("raceId", IntegerType(), True),
+    fields=[StructField("raceId", IntegerType(), False),
             StructField("driverId", IntegerType(), True),
             StructField("lap", IntegerType(), True),
             StructField("position", IntegerType(), True),
@@ -65,7 +65,7 @@ display(final_lap_times_df)
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ##### Step 3 - Write to aoutput to processed container in parquet format
+# MAGIC ##### Step 3 - Write to output to processed container in parquet format
 
 # COMMAND ----------
 
