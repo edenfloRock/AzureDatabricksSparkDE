@@ -4,6 +4,16 @@
 
 # COMMAND ----------
 
+# DBTITLE 1,Data source parameter
+dbutils.widgets.text("p_data_source", "", "Data Source")
+
+# COMMAND ----------
+
+v_data_source = dbutils.widgets.get("p_data_source")
+print(v_data_source)
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC ##### Step 1 - Read the JSON file using the spark dataframe reader API
 
@@ -66,7 +76,8 @@ from pyspark.sql.functions import col, concat,  lit
 drivers_with_columns_df = drivers_df \
     .withColumnRenamed("driverId", "driver_id") \
     .withColumnRenamed("driverRef", "driver_ref") \
-    .withColumn("name", concat(col("name.forename"), lit(" "), col("name.surname")))
+    .withColumn("name", concat(col("name.forename"), lit(" "), col("name.surname"))) \
+    .withColumn("data_source", lit(v_data_source))
 
 display(drivers_with_columns_df)
 
@@ -99,3 +110,8 @@ drivers_final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/drive
 # COMMAND ----------
 
 display(spark.read.parquet(f"{processed_folder_path}/drivers"))
+
+# COMMAND ----------
+
+# DBTITLE 1,Return "Success"
+dbutils.notebook.exit("Success")

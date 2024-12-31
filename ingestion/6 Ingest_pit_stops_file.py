@@ -4,6 +4,15 @@
 
 # COMMAND ----------
 
+dbutils.widgets.text("p_data_source", "", "Data Source")
+
+# COMMAND ----------
+
+v_data_source = dbutils.widgets.get("p_data_source")
+print(v_data_source)
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC ##### Step 1 - Red the JSON file using the spark dataframe reader API
 
@@ -49,7 +58,8 @@ display(pits_stops_df)
 
 pit_stops_final1_df = pits_stops_df \
   .withColumnRenamed("driverId", "driver_id") \
-  .withColumnRenamed("raceId", "race_id")
+  .withColumnRenamed("raceId", "race_id") \
+  .withColumn("data_source", lit(v_data_source))
 
 display(pit_stops_final1_df)
 
@@ -76,3 +86,8 @@ pit_stops_final_df \
 # COMMAND ----------
 
 display(spark.read.parquet(f"{processed_folder_path}/pit_stops"))
+
+# COMMAND ----------
+
+# DBTITLE 1,Return "Success"
+dbutils.notebook.exit("Success")

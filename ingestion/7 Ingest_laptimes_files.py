@@ -4,6 +4,15 @@
 
 # COMMAND ----------
 
+dbutils.widgets.text("p_data_source", "", "Data Source")
+
+# COMMAND ----------
+
+v_data_source = dbutils.widgets.get("p_data_source")
+print(v_data_source)
+
+# COMMAND ----------
+
 # MAGIC %run "../includes/configuration"
 
 # COMMAND ----------
@@ -64,7 +73,8 @@ lap_times_df.count()
 
 lap_times_final1_df = lap_times_df \
     .withColumnRenamed('raceId', 'race_id') \
-    .withColumnRenamed('driverId', 'driver_id')
+    .withColumnRenamed('driverId', 'driver_id') \
+    .withColumn("data_source", lit(v_data_source))
     
 display(lap_times_final1_df)
 
@@ -91,3 +101,8 @@ display(df)
 # COMMAND ----------
 
 df.count()
+
+# COMMAND ----------
+
+# DBTITLE 1,Return "Success"
+dbutils.notebook.exit("Success")

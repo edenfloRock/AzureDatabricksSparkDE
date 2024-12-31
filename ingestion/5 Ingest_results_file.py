@@ -4,6 +4,15 @@
 
 # COMMAND ----------
 
+dbutils.widgets.text("p_data_source", "", "Data Source")
+
+# COMMAND ----------
+
+v_data_source = dbutils.widgets.get("p_data_source")
+print(v_data_source)
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC ##### Stemp 1 - Load file with schema
 
@@ -68,6 +77,7 @@ results_renamed_df = results_df \
     .withColumnRenamed("fastestLap", "fastest_lap") \
     .withColumnRenamed("fastestLapTime", "fastest_lap_time") \
     .withColumnRenamed("fastestLapSpeed", "fastest_lap_speed") \
+    .withColumn("data_source", lit(v_data_source)) \
     .drop ("statusId")
 
 display(results_renamed_df)
@@ -95,3 +105,8 @@ display(dbutils.fs.ls(f"{processed_folder_path}/results"))
 # COMMAND ----------
 
 display(spark.read.parquet(f"{processed_folder_path}/results"))
+
+# COMMAND ----------
+
+# DBTITLE 1,Return "Success"
+dbutils.notebook.exit("Success")

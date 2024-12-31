@@ -4,6 +4,20 @@
 
 # COMMAND ----------
 
+# parameters
+dbutils.widgets.help()
+
+# COMMAND ----------
+
+dbutils.widgets.text("p_data_source", "", "Data Source")
+
+# COMMAND ----------
+
+v_data_source = dbutils.widgets.get("p_data_source")
+print(v_data_source)
+
+# COMMAND ----------
+
 # DBTITLE 1,run configuration Notebook
 # MAGIC %run "../includes/configuration"
 
@@ -126,7 +140,8 @@ circuits_renamed_df = circuits_df.withColumnRenamed("circuitId", "circuit_id") \
   .withColumnRenamed("circuitRef", "circuit_ref") \
   .withColumnRenamed("latitude", "latitudes") \
   .withColumnRenamed("long", "longitude") \
-  .withColumnRenamed("alt", "altitudes") 
+  .withColumnRenamed("alt", "altitudes") \
+  .withColumn("data_source", lit(v_data_source))
 display(circuits_renamed_df)
 
 
@@ -185,3 +200,8 @@ circuits_final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/circ
 
 df = spark.read.parquet(f"{processed_folder_path}/circuits")
 display(df)
+
+# COMMAND ----------
+
+# DBTITLE 1,Return "Success"
+dbutils.notebook.exit("Success")

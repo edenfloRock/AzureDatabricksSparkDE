@@ -4,6 +4,16 @@
 
 # COMMAND ----------
 
+# DBTITLE 1,Data source parameter
+dbutils.widgets.text("p_data_source", "", "Data Source")
+
+# COMMAND ----------
+
+v_data_source = dbutils.widgets.get("p_data_source")
+print(v_data_source)
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC ##### Step 1 -  Read the JSON file using the spark dataframe reader
 
@@ -47,6 +57,7 @@ constructor_dropped_df = constructor_df.drop("url")
 contructor_final1_df = constructor_dropped_df \
   .withColumnRenamed("constructorId", "constructor_id") \
   .withColumnRenamed("constructorRef", "constructor_ref") \
+  .withColumn("data_source", lit(v_data_source))
 
 display(contructor_final1_df)
 
@@ -62,5 +73,14 @@ contructor_final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/co
 
 # COMMAND ----------
 
+display( spark.read.parquet(f"{processed_folder_path}/constructors"))
+
+# COMMAND ----------
+
 
 display(dbutils.fs.ls(f"{processed_folder_path}/constructors"))
+
+# COMMAND ----------
+
+# DBTITLE 1,Return "Success"
+dbutils.notebook.exit("Success")

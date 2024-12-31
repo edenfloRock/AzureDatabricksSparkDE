@@ -4,6 +4,15 @@
 
 # COMMAND ----------
 
+dbutils.widgets.text("p_data_source", "", "Data Source")
+
+# COMMAND ----------
+
+v_data_source = dbutils.widgets.get("p_data_source")
+print(v_data_source)
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC ##### Step 1 - Load files
 
@@ -59,7 +68,8 @@ qualifying_final1_df = qualifying_df \
     .withColumnRenamed("qualifyId", "qualify_id") \
     .withColumnRenamed("raceId", "race_id") \
     .withColumnRenamed("driverId", "driver_id") \
-    .withColumnRenamed("constructorId", "constructor_id")    
+    .withColumnRenamed("constructorId", "constructor_id") \
+    .withColumn("data_source", lit(v_data_source))
 
 display(qualifying_final1_df)
 
@@ -91,3 +101,8 @@ df.count()
 # COMMAND ----------
 
 display(df)
+
+# COMMAND ----------
+
+# DBTITLE 1,Return "Success"
+dbutils.notebook.exit("Success")
