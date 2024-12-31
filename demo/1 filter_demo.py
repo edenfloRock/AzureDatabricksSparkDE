@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # Filter Dmo
+# MAGIC # Filter Demo
 
 # COMMAND ----------
 
