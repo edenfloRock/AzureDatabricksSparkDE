@@ -1,5 +1,6 @@
 # Databricks notebook source
-from pyspark.sql.functions import current_timestamp, lit
+from pyspark.sql.functions import current_timestamp, lit, sum, count, when, col
+
 
 # COMMAND ----------
 
