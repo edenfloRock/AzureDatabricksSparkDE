@@ -61,7 +61,8 @@ results_drivers_df = results_df.join(drivers_df, results_df.driver_id == drivers
         results_df["grid"], 
         results_df["fastest_lap"], 
         results_df["time"].alias("race_time"),
-        results_df["points"]
+        results_df["points"],
+        results_df["position"]
     )
 display(results_drivers_df)
 
@@ -106,7 +107,8 @@ data_df = results_drivers_constructors_df.join(
         "grid",
         "fastest_lap",
         "race_time", 
-        "points",        
+        "points",
+        "position",
         "created_date"
     )
 display(data_df)
@@ -125,6 +127,11 @@ display(data_df.filter("race_year == 2020 and race_name == 'Abu Dhabi Grand Prix
 data_df.write \
     .mode("overwrite") \
     .parquet(f"{presentation_folder_path}/race_results")
+
+# COMMAND ----------
+
+final_results_df = spark.read.parquet(f"{presentation_folder_path}/race_results")
+display(final_results_df)
 
 # COMMAND ----------
 
