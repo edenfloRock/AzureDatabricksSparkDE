@@ -1,5 +1,10 @@
 -- Databricks notebook source
 -- MAGIC %md
+-- MAGIC # Create Database
+
+-- COMMAND ----------
+
+-- MAGIC %md
 -- MAGIC ##### Learn Objectives
 -- MAGIC 1. Spark SQL documentation 
 -- MAGIC 2. Create database demo
@@ -17,7 +22,7 @@
 -- COMMAND ----------
 
 -- DBTITLE 1,2
-create database demo
+--create database demo
 
 -- COMMAND ----------
 
@@ -57,4 +62,5 @@ show tables
 
 -- COMMAND ----------
 
-
+-- MAGIC %md
+-- MAGIC ##
